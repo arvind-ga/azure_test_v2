@@ -31,6 +31,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
+          enable-debug-logs: true
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_56B5CD4A1DCB4F4598F2F0A08904A1A3 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_88CF67E749284971B5446D7CAFF966D6 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C75A335571C94E30B0D9BF8436F29133 }}
