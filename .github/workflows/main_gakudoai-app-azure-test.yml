@@ -1,6 +1,9 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
 name: Build and deploy Python app to Azure Web App - gakudoai-app-azure-test
 
@@ -8,7 +11,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
@@ -22,46 +24,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write #This is required for requesting the JWT
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -69,10 +31,34 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_88CF67E749284971B5446D7CAFF966D6 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C75A335571C94E30B0D9BF8436F29133 }}
 
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
+      # Build Docker images
+      - name: Build and tag Docker images
+        run: |
+          docker build -t myacrname.azurecr.io/fastapi-app:latest -f ./Dockerfile ./
+          docker build -t myacrname.azurecr.io/nextjs-app:latest -f ./nextjs/Dockerfile ./nextjs
+
+      # Push Docker images to Azure Container Registry (ACR)
+      - name: Push Docker images to ACR
+        run: |
+          docker login myacrname.azurecr.io -u ${{ secrets.ACR_USERNAME }} -p ${{ secrets.ACR_PASSWORD }}
+          docker push myacrname.azurecr.io/fastapi-app:latest
+          docker push myacrname.azurecr.io/nextjs-app:latest
+
+      # Deploy to Azure Web App Service
+      - name: Deploy to Azure Web App Service
+        uses: azure/webapps-deploy@v2
         with:
-          app-name: 'gakudoai-app-azure-test'
-          slot-name: 'Production'
-          
+          app-name: my-webapp-name
+          slot-name: production
+          images: |
+            myacrname.azurecr.io/fastapi-app:latest
+            myacrname.azurecr.io/nextjs-app:latest
+
+      # Optionally provision MongoDB and Redis containers
+      - name: Deploy MongoDB and Redis
+        run: |
+          docker pull mongo:latest
+          docker pull redis:latest
+          docker network create app-network || true
+          docker run --name mongo -d --network app-network mongo:latest
+          docker run --name redis -d --network app-network redis:latest
