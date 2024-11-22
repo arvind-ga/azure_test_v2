@@ -13,7 +13,7 @@ services:
       - nextjs    # Ensure frontend and backend are running before Nginx starts
       - fastapi
     networks:
-      - azure_test_v2_dev-network
+      - dev-network
 
   nextjs:
     build:
@@ -27,7 +27,7 @@ services:
     depends_on:
       - fastapi
     networks:
-      - azure_test_v2_dev-network
+      - dev-network
 
   fastapi:
     build:
@@ -41,7 +41,7 @@ services:
       - mongodb
       - redis
     networks:
-      - azure_test_v2_dev-network
+      - dev-network
 
   mongodb:
     image: mongo:latest
@@ -53,7 +53,7 @@ services:
     volumes:
       - mongodb_data:/data/db
     networks:
-      - azure_test_v2_dev-network
+      - dev-network
 
   redis:
     image: redis:latest
@@ -62,7 +62,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - azure_test_v2_dev-network
+      - dev-network
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
