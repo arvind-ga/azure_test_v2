@@ -55,6 +55,7 @@ services:
     networks:
       - dev-network
 
+
   redis:
     image: redis:latest
     ports:
