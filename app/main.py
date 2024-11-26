@@ -22,6 +22,10 @@ from app.db.redisClient import AsyncRedisClient
 from app.routers import auth, users, chatgpt, register
 from app.routers.settings import messages
 
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 class State:
     """
