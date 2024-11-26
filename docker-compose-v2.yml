@@ -9,11 +9,14 @@ services:
     image: gaicr.azurecr.io/test/nginx
     ports:
       - "80:80"     # Expose Nginx on port 80 to the public
+    volumes:
+      - ${WEBAPP_STORAGE_HOME}/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - nextjs    # Ensure frontend and backend are running before Nginx starts
       - fastapi
     networks:
       - dev-network
+    command: ["/bin/sh", "-c", "[\"nginx\", \"-g\", \"daemon\\ off;\"]"]
 
   nextjs:
     build:
@@ -37,8 +40,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - REDIS_URL=redis://redis:6380
-      - NEXT_PUBLIC_API_KEY=${static_bearer_secret_key}
+#      - REDIS_URL=redis://redis:6379
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NEXT_PUBLIC_API_KEY=4bhY9bWCURUV9kNRXaSv2Te9nZSENvFj
     depends_on:
       - mongodb
       - redis
@@ -49,7 +54,7 @@ services:
     image: gaicr.azurecr.io/test/mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME=bringthemhome
-      - MONGO_INITDB_ROOT_PASSWORD=${mongodb_password}
+      - MONGO_INITDB_ROOT_PASSWORD=CuQGaToMW15h7DND
     ports:
       - "10255:10255" # for testing purposes you can expose the MongoDB port
     volumes:
@@ -57,13 +62,16 @@ services:
     networks:
       - dev-network
 
-
   redis:
     image: gaicr.azurecr.io/test/redis
     ports:
-      - "6380:6380"
+      - "6379:6379"
     volumes:
       - redis_data:/data
+      - ${WEBAPP_STORAGE_HOME}/redis.conf:/usr/local/etc/redis/redis.conf
+    sysctls:
+      - net.core.somaxconn=1024
+      - vm.overcommit_memory=1
     networks:
       - dev-network
     healthcheck:
@@ -71,7 +79,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-    command: ["redis-server", "--save", "", "--maxmemory", "1024mb", "--maxmemory-policy", "allkeys-lru"]
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    # command: ["redis-server", "--save", "", "--maxmemory", "1024mb", "--maxmemory-policy", "allkeys-lru"]
 
 volumes:
   mongodb_data:
