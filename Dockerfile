@@ -37,7 +37,7 @@ EXPOSE 8000
 EXPOSE 3000
 EXPOSE 10255
 EXPOSE 6380
-EXPOSE 20017
+EXPOSE 27017
 
 ## Run the container with multiple workers instead if needed.
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "2"]
