@@ -12,4 +12,5 @@ COPY nginx.conf /etc/nginx/conf.d/
 EXPOSE 80
 
 # Start nginx when container starts
-CMD ["nginx" "-g", "daemon off;"]
+# CMD ["nginx" "-g", "daemon off;"]
+CMD ["/bin/sh", "-c", "[\"nginx\", \"-g\", \"daemon\\ off;\"]"
