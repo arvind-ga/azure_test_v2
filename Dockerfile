@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy the current directory contents into the container at /app
 COPY .. /app
+COPY .env /app/.env
 
 
 ## Copy the entrypoint script into the container
