@@ -28,6 +28,16 @@ async def check_key_not_expired(redis_client, key):
 
 
 async def create_indexes():
+    duplicates = await async_database.users.aggregate([
+        {"$group": {"_id": "$email", "count": {"$sum": 1}, "docs": {"$push": "$_id"}}},
+        {"$match": {"count": {"$gt": 1}}}
+    ]).to_list(length=None)
+
+    for entry in duplicates:
+        # Keep the first document, delete the rest
+        ids_to_remove = entry["docs"][1:]
+        await async_database.users.delete_many({"_id": {"$in": ids_to_remove}})
+
     await async_database.users.create_index("email", unique=True)
     await async_database.users.create_index("username", unique=True)
 
