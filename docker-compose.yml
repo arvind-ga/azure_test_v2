@@ -49,7 +49,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=bringthemhome
       - MONGO_INITDB_ROOT_PASSWORD=${mongodb_password}
     ports:
-      - "27017:27017" # for testing purposes you can expose the MongoDB port
+      - "10255:10255" # for testing purposes you can expose the MongoDB port
     volumes:
       - mongodb_data:/data/db
     networks:
