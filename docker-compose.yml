@@ -48,8 +48,10 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=bringthemhome
       - MONGO_INITDB_ROOT_PASSWORD=${mongodb_password}
+    security:
+      authorization: "enabled"
     ports:
-      - "10255:10255" # for testing purposes you can expose the MongoDB port
+      - "27017:27017" # for testing purposes you can expose the MongoDB port
     volumes:
       - mongodb_data:/data/db
     networks:
