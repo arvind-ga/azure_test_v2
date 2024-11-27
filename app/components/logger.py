@@ -44,7 +44,7 @@ class DailyRotatingFileHandler(BaseRotatingHandler):
 # Create base 'logs' directory if it doesn't exist
 base_log_dir = 'logs'
 if not os.path.exists(base_log_dir):
-    os.makedirs(base_log_dir)
+    os.makedirs(base_log_dir, exist_ok=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
