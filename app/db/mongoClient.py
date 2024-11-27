@@ -10,10 +10,10 @@ load_dotenv()  # loading environment variables
 
 MONGODB_USER = os.getenv("mongodb_username")
 MONGODB_PASS = os.getenv("mongodb_password")
-MONGODB_SERVER = os.getenv("mongodb_server")
+MONGODB_SERVER =  "127.0.0.1" #os.getenv("mongodb_server")
 MONGODB_PORT = os.getenv("mongodb_port")
 
-MONGODB_CONNECTION_STRING = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_SERVER}:{MONGODB_PORT}"
+MONGODB_CONNECTION_STRING = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_SERVER}:{MONGODB_PORT}/?authSource=admin&ssl=true&connectTimeoutMS=3000"
 
 # Asynchronous MongoDB connection
 async_connection_string = f'{MONGODB_CONNECTION_STRING}'  # This can be the same as the synchronous connection string
